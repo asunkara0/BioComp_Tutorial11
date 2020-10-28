@@ -2,7 +2,8 @@
 #set working directory where this script will act and where this script is located
 #only .csv files with numeric values in this directory
 #Creating function that takes three variables and calculates the 
-#coefficient of variation for each for a user specified column
+#coefficient of variation for each user specified column
+#Works with NAs in line
 #dir is directory name
 #column is the column number that is to be analyzed
 #override determines whether or not 50 lines are required in each file
@@ -24,7 +25,9 @@ coefficientcalc <- function(directory, columnnumber, ovverride = FALSE){
   
   #for loop
   for (i in 1:length(filenames)){
-
+    
+    #if statement to complete calculations only when column exists in file
+if(dim(read.csv(filenames[i], header = TRUE))[2]>(columnnumber-1)){
     #column stores the column of importance from each file being read
     column = read.csv(filenames[i], header = TRUE)[,columnnumber]
     
@@ -34,22 +37,26 @@ coefficientcalc <- function(directory, columnnumber, ovverride = FALSE){
       finalcoefficient[i] = sd(column)/mean(column)
       overrideerror = TRUE
       
-    }
-   else if (length(column)>=50 & override == TRUE){
+    }else if (length(column)>=50 & override == TRUE){
       finalcoefficient[i] = sd(column)/mean(column)
       overrideerror = FALSE
       overridecheck = TRUE
-    }
-    else if (length(column)<50 & override == FALSE){
+    }else if (length(column)<50 & override == FALSE){
       finalcoefficient[i] = sd(column)/mean(column)
       return("Not enough observations in column!")
       error = TRUE
-    }
-    else if (length(column)>=50 & override == FALSE & error == FALSE){
+    }else if (length(column)>=50 & override == FALSE & error == FALSE){
       finalcoefficient[i] = sd(column)/mean(column)
       error = FALSE
     }
     
+}
+    
+    else {
+      finalcoefficient[i] = NA
+      
+      
+    }
   }
   
   #returning either error or the finalcoefficient vector based on whether or not 50 items were included in each variable
@@ -57,20 +64,21 @@ coefficientcalc <- function(directory, columnnumber, ovverride = FALSE){
   
   #return for when override is given
   if (override == TRUE & overrideerror == TRUE & overridecheck == TRUE){
-    return(finalcoefficient)
-    #return (filenames)
+    combinedfinal = c(finalcoefficient, filenames)
+    return(combinedfinal)
     
   }else if (override == TRUE & overrideerror == TRUE & overridecheck == FALSE){
     return("Not enough observations in column!")
     
   }else if (override == TRUE & overrideerror == FALSE){
-    return(finalcoefficient)
-    #return (filenames)
+    combinedfinal = c(finalcoefficient, filenames)
+    return(combinedfinal)
+    
     
   }else if (override == FALSE & error == FALSE){
     #return for when no override is given
-    return(finalcoefficient)
-    #return (filenames)
+    combinedfinal = c(finalcoefficient, filenames)
+    return(combinedfinal)
     
   }
   
