@@ -85,5 +85,4 @@ if(dim(read.csv(filenames[i], header = TRUE))[2]>(columnnumber-1)){
 }
 
 
-coefficientcalc("/Users/anoopsunkara/Downloads/Biocomputing/BioComp_Tutorial11/PracticeFolder", 2, FALSE)
 
